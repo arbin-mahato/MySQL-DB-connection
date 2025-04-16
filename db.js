@@ -1,19 +1,21 @@
-const mysql = require("mysql");
+const mysql = require("mysql2/promise"); // Using promise version for async/await
 require("dotenv").config();
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
+const connectDB = async () => {
+  try {
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    });
 
-db.connect((err) => {
-  if (err) {
-    console.error("❌ Error connecting to MySQL:", err);
-    return;
+    console.log(`✅ MySQL connected with server: ${connection.config.host}`);
+    return connection;
+  } catch (error) {
+    console.error("❌ MySQL connection failed:", error);
+    process.exit(1);
   }
-  console.log("✅ Connected to MySQL database!");
-});
+};
 
-module.exports = db;
+module.exports = connectDB;
